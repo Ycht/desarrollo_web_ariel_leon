@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="esp">
+    <head>
+        <meta charset="utf-8">
+        <title>Agregar aviso de adopción</title>
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+    </head>
+
+    <body>
+        <div class="navbar">
+            <a class="navbar-page" href="./index.html">Inicio</a>
+            <a class="navbar-page" href="./agregar-adopcion.html">Agregar aviso de adopción</a>
+			<a class="navbar-page" href="./listado-adopciones.html">Ver listado de adopciones</a>
+			<a class="navbar-page" href="./estadisticas.html">Estadísticas</a>
+        </div>
+        <br/>
+	    <h2>Agregar aviso de adopción</h2>
+        <br/>
+        <form method="POST">
+            <h3>¿Dónde?</h3>
+            <p>
+                <label for="regiones">Región<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <select id="regiones" name="region" required></select>
+                <span class="error" id="error-region"></span>
+            </p>
+            <p>
+                <label for="comunas">Comuna<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <select id="comunas" name="comuna" required></select>
+                <span class="error" id="error-comuna"></span>
+            </p>
+            <p>
+                <label for="sector">Sector</label>
+                <input type="text" id="sector" name="sector" maxlength="100">
+                <span class="error" id="error-sector"></span>
+            </p>
+
+            <h3>¿Contacto de esta publicación?</h3>
+            <p>
+                <label for="nombre">Nombre<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <input type="text" id="nombre" name="nombre" minlength="3" maxlength="200" required>
+                <span class="error" id="error-nombre"></span>
+            </p>
+            <p>
+                <label for="email">Email<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+		        <input type="Email" id="email" name="email" maxlength="100" required>
+                <span class="error" id="error-email"></span>
+            </p>
+            <p>
+                <label for="celular">Número de celular</label>
+		        <input type="tel" id="celular" name="celular" pattern="^\+\d{3}\.\d{8,9}$" placeholder="+569 12345678" maxlength="15">
+                <span class="error" id="error-celular"></span>
+            </p>
+            <p>
+                <label for="contactar-por">Contactar por (opcional, máximo 5)</label>
+                <div id="contactosContainer">
+                    <div class="contacto">
+                    <label>Contacto:</label>
+                    <select name="contacto_tipo[]" class="contacto-select">
+                        <option value="">Seleccione</option>
+                        <option value="whatsapp">Whatsapp</option>
+                        <option value="telegram">Telegram</option>
+                        <option value="x">X</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="otra">Otra</option>
+                    </select>
+                    <input type="text" 
+                            name="contacto_id[]" 
+                            class="contacto-input"
+                            placeholder="Ingrese ID o URL"
+                            minlength="4" maxlength="50"
+                            style="display:none;">
+                    <button type="button" class="eliminar-btn" style="display:none;">Eliminar</button>
+                    </div>
+                </div>
+
+                <button type="button" id="agregarBtn">Agregar contacto</button>
+                <span class="error" id="error-contacto"></span>
+            </p>
+
+            <h3>¿Qué mascota ofrece en adopción?</h3>
+            <p>
+                <fieldset>
+                    <legend>Tipo*</legend>
+                    <div>
+                        <input type="radio" id="tipo-gato" name="tipo-mascota" value="gato" />
+                        <label for="tipo-gato">Gato</label>
+
+                        <input type="radio" id="tipo-perro" name="tipo-mascota" value="perro" />
+                        <label for="tipo-perro">Perro</label>
+                    </div>
+                </fieldset>
+                <span class="error" id="error-tipo-mascota"></span>
+            </p>
+            <p>
+                <label for="cantidad-mascota">Cantidad<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <input type="number" id="cantidad-mascota" name="cantidad-mascota" min="1" step="1" required>
+                <span class="error" id="error-cantidad"></span>
+            </p>
+            <p>
+                <label for="edad-mascota">Edad<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <input type="number" id="edad-mascota" name="edad-mascota" min="1" step="1" required>
+                <span class="error" id="error-edad"></span>
+            </p>
+            <p>
+                <label for="medida-edad">Unidad medida edad<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+                <select id="medida-edad" name="medida-edad" required>
+                    <option value="">Seleccione</option>
+                    <option value="meses">Meses</option>
+                    <option value="años">Años</option>
+                </select>
+                <span class="error" id="error-medida-edad"></span>
+            </p>
+            <p>
+                <label for="fecha-entrega">Fecha disponible para entrega<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+		        <input type="datetime-local" id="fecha-entrega" name="fecha-entrega" required >
+                <span class="error" id="error-fecha"></span>
+            </p>
+            <p>
+                <label for="descripcion-mascota">Descripción</label>
+		        <textarea id="descripcion-mascota" name="descripcion-mascota" maxlength="500" rows="10" cols="50"></textarea>
+            </p>
+            <p>
+                <label for="foto-mascota">Foto/s<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
+		        <input type="file" id="foto-mascota" name="foto-mascota" multiple accept="image/*" required>
+                <span class="error" id="error-foto"></span>
+            </p>
+
+            <p>
+                <button type="submit">Agregar adopción</button>
+            </p>
+        </form>
+
+        <script lang="javascript" src="../js/form.js"></script>
+    </body>
+</html>
