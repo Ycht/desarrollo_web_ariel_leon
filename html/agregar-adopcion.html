@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="esp">
+<html lang="es">
     <head>
         <meta charset="utf-8">
         <title>Agregar aviso de adopción</title>
@@ -19,12 +19,16 @@
             <h3>¿Dónde?</h3>
             <p>
                 <label for="regiones">Región<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
-                <select id="regiones" name="region" required></select>
+                <select id="regiones" name="region" required>
+                    <option value="">Seleccione región</option>
+                </select>
                 <span class="error" id="error-region"></span>
             </p>
             <p>
                 <label for="comunas">Comuna<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
-                <select id="comunas" name="comuna" required></select>
+                <select id="comunas" name="comuna" required>
+                    <option value="">Seleccione comuna</option>
+                </select>
                 <span class="error" id="error-comuna"></span>
             </p>
             <p>
@@ -49,48 +53,45 @@
 		        <input type="tel" id="celular" name="celular" pattern="^\+\d{3}\.\d{8,9}$" placeholder="+569 12345678" maxlength="15">
                 <span class="error" id="error-celular"></span>
             </p>
-            <p>
-                <label for="contactar-por">Contactar por (opcional, máximo 5)</label>
-                <div id="contactosContainer">
-                    <div class="contacto">
-                    <label>Contacto:</label>
-                    <select name="contacto_tipo[]" class="contacto-select">
-                        <option value="">Seleccione</option>
-                        <option value="whatsapp">Whatsapp</option>
-                        <option value="telegram">Telegram</option>
-                        <option value="x">X</option>
-                        <option value="instagram">Instagram</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="otra">Otra</option>
-                    </select>
-                    <input type="text" 
-                            name="contacto_id[]" 
-                            class="contacto-input"
-                            placeholder="Ingrese ID o URL"
-                            minlength="4" maxlength="50"
-                            style="display:none;">
-                    <button type="button" class="eliminar-btn" style="display:none;">Eliminar</button>
-                    </div>
+            <label for="contactar-por">Contactar por (opcional, máximo 5)</label>
+            <div id="contactosContainer">
+                <div class="contacto">
+                <label>Contacto:</label>
+                <select id="contactar-por" name="contacto_tipo[]" class="contacto-select">
+                    <option value="">Seleccione</option>
+                    <option value="whatsapp">Whatsapp</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="x">X</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="otra">Otra</option>
+                </select>
+                <input type="text" 
+                        name="contacto_id[]" 
+                        class="contacto-input"
+                        placeholder="Ingrese ID o URL"
+                        minlength="4" maxlength="50"
+                        style="display:none;">
+                <button type="button" class="eliminar-btn" style="display:none;">Eliminar</button>
                 </div>
+            </div>
 
-                <button type="button" id="agregarBtn">Agregar contacto</button>
-                <span class="error" id="error-contacto"></span>
-            </p>
+            <button type="button" id="agregarBtn">Agregar contacto</button>
+            <span class="error" id="error-contacto"></span>
 
             <h3>¿Qué mascota ofrece en adopción?</h3>
-            <p>
-                <fieldset>
-                    <legend>Tipo*</legend>
-                    <div>
-                        <input type="radio" id="tipo-gato" name="tipo-mascota" value="gato" />
-                        <label for="tipo-gato">Gato</label>
 
-                        <input type="radio" id="tipo-perro" name="tipo-mascota" value="perro" />
-                        <label for="tipo-perro">Perro</label>
-                    </div>
-                </fieldset>
-                <span class="error" id="error-tipo-mascota"></span>
-            </p>
+            <fieldset>
+                <legend>Tipo*</legend>
+                <div>
+                    <input type="radio" id="tipo-gato" name="tipo-mascota" value="gato" />
+                    <label for="tipo-gato">Gato</label>
+
+                    <input type="radio" id="tipo-perro" name="tipo-mascota" value="perro" />
+                    <label for="tipo-perro">Perro</label>
+                </div>
+            </fieldset>
+            <span class="error" id="error-tipo-mascota"></span>
             <p>
                 <label for="cantidad-mascota">Cantidad<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
                 <input type="number" id="cantidad-mascota" name="cantidad-mascota" min="1" step="1" required>
@@ -130,6 +131,6 @@
             </p>
         </form>
 
-        <script lang="javascript" src="../js/form.js"></script>
+        <script src="../js/form.js"></script>
     </body>
 </html>
