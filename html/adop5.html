@@ -6,11 +6,11 @@
         <link rel="stylesheet" type="text/css" href="../css/style.css">
     </head>
     <body>
-        <div id="header">
-            <ul class="nav">
-                <li><a href="./index.html">Volver a la página inicial</a></li>
-                <li><a href="./listado-adopciones.html">Volver a la lista de adopciones</a></li>
-            </ul>
+        <div class="navbar">
+            <a class="navbar-page" href="./index.html">Inicio</a>
+            <a class="navbar-page" href="./agregar-adopcion.html">Agregar aviso de adopción</a>
+			<a class="navbar-page" href="./listado-adopciones.html">Ver listado de adopciones</a>
+			<a class="navbar-page" href="./estadisticas.html">Estadísticas</a>
         </div>
         <br/>
         <h1>Tipo de mascota: Gato</h1>
@@ -35,6 +35,12 @@
             <span class="close">&times;</span>
             <img class="modal-content" alt="modal camera" src="../media/gato3.jpg" id="img01">
             <div id="caption"></div>
+        </div>
+
+        <br/><br/>
+        <div class="nav-buttons">
+            <a href="./listado-adopciones.html" class="btn">⬅️ Volver al listado</a>
+            <a href="./index.html" class="btn">Volver al inicio</a>
         </div>
 
         <script lang="javascript" src="../js/adopciones.js"></script>

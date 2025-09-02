@@ -1,3 +1,43 @@
+/* Barra de navegación */
+.navbar {
+  background-color: #329ea8;
+  display: flex;                /* para que los links se ordenen en fila */
+  justify-content: flex-start;  /* alineación a la izquierda */
+  padding: 0.5rem 0.5rem;         /* espacio interno */
+}
+
+/* Links dentro de la barra */
+.navbar-page {
+  color: white;                 /* color del texto */
+  text-decoration: none;        /* sin subrayado */
+  padding: 0.5rem 1rem;         /* espacio alrededor */
+  transition: background 0.3s;  /* animación suave al pasar el mouse */
+}
+
+.navbar-page:hover {
+  background-color: #20676e;       /* cambia el fondo al pasar el mouse */
+  border-radius: 5px;           /* esquinas suaves */
+}
+
+.nav-buttons {
+    margin-top: 20px;
+}
+
+.nav-buttons .btn {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px;
+    background-color: #329ea8;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.nav-buttons .btn:hover {
+    background-color: #20676e;
+}
+
 .error { 
     color: red;
     font-size: 0.9em; 

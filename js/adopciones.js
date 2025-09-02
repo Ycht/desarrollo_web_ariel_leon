@@ -1,3 +1,11 @@
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("tr[data-href]").forEach(row => {
+        row.addEventListener("click", () => {
+            window.location.href = row.dataset.href;
+        });
+    });
+});
+
 // ver imagenes
 var modal = document.getElementById("myModal");
 var img = document.getElementById("myImg");
