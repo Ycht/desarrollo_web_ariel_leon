@@ -30,10 +30,10 @@ class Comuna(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100), nullable=False)
-    region_id = Column(Integer, ForeignKey("regiones.id"), nullable=False)
+    region_id = Column(Integer, ForeignKey("region.id"), nullable=False)
 
     region = relationship("Region", back_populates="comunas")
-    adopciones = relationship("AvisoAdopcion", back_populates="comuna")
+    avisos = relationship("AvisoAdopcion", back_populates="comuna")
 
 class AvisoAdopcion(Base):
     __tablename__ = "aviso_adopcion"
@@ -62,7 +62,7 @@ class Foto(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ruta_archivo = Column(String(300), nullable=False)
     nombre_archivo = Column(String(300), nullable=False)
-    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="fotos")
 
@@ -72,7 +72,7 @@ class ContactarPor(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(Enum("whatsapp", "telegram", "X", "instagram", "tiktok", "otra"), nullable=False)
     identificador = Column(String(150), nullable=False)
-    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 
@@ -81,3 +81,15 @@ class ContactarPor(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+
+def get_regiones():
+    session = SessionLocal()
+    regiones = session.query(Region).order_by(Region.nombre).all()
+    session.close()
+    return regiones
+
+def get_comunas_por_region(region_id):
+    session = SessionLocal()
+    comunas = session.query(Comuna).filter(Comuna.region_id == region_id).order_by(Comuna.nombre).all()
+    session.close()
+    return comunas

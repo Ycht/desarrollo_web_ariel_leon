@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}{% endblock %}</title>
+        {% block css %}{% endblock %}
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/style.css') }}"
+        />
+    </head>
+    <body>
+        <div class="navbar">
+            <a class="navbar-page" href="{{ url_for('index') }}">Inicio</a>
+        <a class="navbar-page" href="{{ url_for('agregar_adopcion') }}">Agregar aviso de adopción</a>
+        <a class="navbar-page" href="{{ url_for('listado_adopciones') }}">Ver listado de adopciones</a>
+        <a class="navbar-page" href="{{ url_for('estadisticas') }}">Estadísticas</a>
+        </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+     {% block javascript %}{% endblock %}
+     
+    </body>
+</html>

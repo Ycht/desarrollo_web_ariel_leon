@@ -1,75 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <title>Listado de avisos de adopción</title>
-        <link rel="stylesheet" type="text/css" href="../css/style.css">
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <div class="navbar">
-            <a class="navbar-page" href="./index.html">Inicio</a>
-            <a class="navbar-page" href="./agregar-adopcion.html">Agregar aviso de adopción</a>
-			<a class="navbar-page" href="./listado-adopciones.html">Ver listado de adopciones</a>
-			<a class="navbar-page" href="./estadisticas.html">Estadísticas</a>
-        </div>
-	    <h1>Listado de adopciones</h1>
-        <br/>
-        <table>
-            <tr>
-                <th>Fecha publicación</th>
-                <th>Comuna</th>
-                <th>Sector</th>
-                <th>Cantidad - Tipo - Edad</th>
-                <th>Foto/s</th>
-            </tr>
-            <tr data-href="./adop1.html">
-                <td>2025-08-21 15:30</td>
-                <td>Santiago</td>
-                <td>República</td>
-                <td>3 perros - 4 meses</td>
-                <td>
-                    <img id="myImg1" alt="aviso adopción 1" src="../media/perro1.jpg" width="320" height="240">
-                </td>
-            </tr>
-            <tr data-href="./adop2.html">
-                <td>2025-08-08 10:00</td>
-                <td>Ñuñoa</td>
-                <td>Tobalaba</td>
-                <td>4 gatos - 1 mes</td>
-                <td>
-                    <img id="myImg2" alt="aviso adopción 2" src="../media/gato1.jpg" width="320" height="240">
-                </td>
-            </tr>
-            <tr data-href="./adop3.html">
-                <td>2025-08-04 13:15</td>
-                <td>Lo Espejo</td>
-                <td>Población José María Caro</td>
-                <td>3 perros - 6 meses</td>
-                <td>
-                    <img id="myImg3" alt="aviso adopción 3" src="../media/perro2.jpg" width="320" height="240">
-                </td>
-            </tr>
-            <tr data-href="./adop4.html">
-                <td>2025-07-17 16:00</td>
-                <td>Quilicura</td>
-                <td>Santa Paula</td>
-                <td>8 gatos - 3 meses</td>
-                <td>
-                    <img id="myImg4" alt="aviso adopción 4" src="../media/gato2.jpg" width="320" height="240">
-                </td>
-            </tr>
-            <tr data-href="./adop5.html">
-                <td>2025-07-01 18:00</td>
-                <td>Santiago</td>
-                <td>San Vicente</td>
-                <td>5 gatos - 5 meses</td>
-                <td>
-                    <img id="myImg5" alt="aviso adopción 5" src="../media/gato3.jpg" width="320" height="240">
-                </td>
-            </tr>
-        </table>
+{% block title %} Listado de avisos de adopción {% endblock %}
 
-        <script src="../js/adopciones.js"></script>
-    </body>
-</html>
+{% block content %}
+<h1>Listado de adopciones</h1>
+<ul>
+  {% for aviso in avisos %}
+  <li>
+    <strong>{{ aviso.tipo | capitalize }}</strong>
+    ({{ aviso.cantidad }}) - {{ aviso.comuna.nombre }}
+    <br />
+    Contacto: {{ aviso.nombre }} ({{ aviso.email }})
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
+
+{% block javascript %}
+<!-- <script lang="javascript" src="{{ url_for('static', filename='js/adopciones.js') }}"></script> -->
+{% endblock %}

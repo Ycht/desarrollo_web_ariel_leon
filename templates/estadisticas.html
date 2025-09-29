@@ -1,28 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <title>Estadísticas</title>
-        <link rel="stylesheet" type="text/css" href="../css/style.css">
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <div class="navbar">
-            <a class="navbar-page" href="./index.html">Inicio</a>
-            <a class="navbar-page" href="./agregar-adopcion.html">Agregar aviso de adopción</a>
-			<a class="navbar-page" href="./listado-adopciones.html">Ver listado de adopciones</a>
-			<a class="navbar-page" href="./estadisticas.html">Estadísticas</a>
-        </div>
-	    <h1>Estadísticas</h1>
-        <br/>
-        <img id="myImg1" alt="Avisos por día (gráfico de línea)" src="../media/graf_linea.png">
-	    <img id="myImg2" alt="Avisos por tipo (gráfico de torta)" src="../media/graf_torta.png">
-	    <img id="myImg3" alt="Avisos por mes (gráfico de barras)" src="../media/graf_barras.png">
+{% block title %} Estadísticas {% endblock %}
 
-        <div class="nav-buttons">
-            <a href="./index.html" class="btn">Volver al inicio</a>
-        </div>
+{% block content %}
+<h1>Estadísticas</h1>
+<ul>
+    <li>Total de avisos: {{ total_avisos }}</li>
+    <li>Total de fotos: {{ total_fotos }}</li>
+    <li>Total de contactos: {{ total_contactos }}</li>
+</ul>
 
-        <script src="../js/adopciones.js"></script>
-    </body>
-</html>
+<h1>Estadísticas</h1>
+<br/>
+<img id="myImg1" alt="Avisos por día (gráfico de línea)" src="{{ url_for('static', filename='graphs/graf_linea.png') }}">
+<img id="myImg2" alt="Avisos por tipo (gráfico de torta)" src="{{ url_for('static', filename='graphs/graf_torta.png') }}">
+<img id="myImg3" alt="Avisos por mes (gráfico de barras)" src="{{ url_for('static', filename='graphs/graf_barras.png') }}">
+
+<div class="nav-buttons">
+    <a href="{{ url_for('index') }}" class="btn">Volver al inicio</a>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<!-- <script lang="javascript" src="{{ url_for('static', filename='js/adopciones.js') }}"></script> -->
+{% endblock %}

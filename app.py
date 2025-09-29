@@ -1,6 +1,6 @@
-from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask import Flask, request, render_template, redirect, url_for, session, flash, jsonify
 from datetime import datetime
-from database.db import SessionLocal, init_db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor
+from database.db import SessionLocal, init_db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor, get_regiones, get_comunas_por_region
 from werkzeug.utils import secure_filename
 import hashlib
 import filetype
@@ -31,9 +31,8 @@ def listado_adopciones():
 
 @app.route("/agregar-adopcion", methods=["GET", "POST"])
 def agregar_adopcion():
-    db = SessionLocal()
-
     if request.method == "POST":
+        db = SessionLocal()  # para guardar los datos
         try:
             comuna_id = request.form.get("comuna")
             sector = request.form.get("sector") or None
@@ -47,6 +46,7 @@ def agregar_adopcion():
             fecha_entrega = datetime.fromisoformat(request.form.get("fecha_entrega"))
             descripcion = request.form.get("descripcion") or None
 
+            # Crear aviso de adopción
             aviso = AvisoAdopcion(
                 fecha_ingreso=datetime.now(),
                 comuna_id=comuna_id,
@@ -77,18 +77,18 @@ def agregar_adopcion():
                     )
                     db.add(c)
 
-            # Procesar fotos (ejemplo: solo guardamos nombres de archivo)
+            # Procesar fotos
             fotos = request.files.getlist("fotos")
             for foto in fotos:
                 if foto.filename:
+                    filename = secure_filename(foto.filename)
                     f = Foto(
-                        ruta_archivo=f"uploads/{foto.filename}",
-                        nombre_archivo=foto.filename,
+                        ruta_archivo=f"uploads/{filename}",
+                        nombre_archivo=filename,
                         actividad_id=aviso.id,
                     )
                     db.add(f)
-                    # Guardar archivo en /static/uploads
-                    foto.save(f"static/uploads/{foto.filename}")
+                    foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             db.commit()
             return redirect(url_for("listado_adopciones"))
@@ -100,11 +100,14 @@ def agregar_adopcion():
         finally:
             db.close()
 
-    # Si es GET → mostrar formulario con regiones y comunas
-    regiones = db.query(Region).all()
-    comunas = db.query(Comuna).all()
-    db.close()
-    return render_template("agregar-adopcion.html", regiones=regiones, comunas=comunas)
+    # Si es GET → mostrar formulario con regiones
+    regiones = get_regiones()  # carga solo regiones
+    return render_template("agregar-adopcion.html", regiones=regiones)
+
+@app.route("/get_comunas/<int:region_id>")
+def get_comunas(region_id):
+    comunas = get_comunas_por_region(region_id)
+    return jsonify([{"id": c.id, "nombre": c.nombre} for c in comunas])
 
 @app.route("/estadisticas")
 def estadisticas():

@@ -1,53 +1,28 @@
-// Diccionario con regiones y sus respectivas comunas
-const regionesYComunas = {
-    "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
-    "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
-    "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama"],
-    "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Freirina", "Huasco", "Alto del Carmen"],
-    "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Los Vilos", "Salamanca", "Canela", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
-    "Valparaíso": ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "Concón", "Quintero", "Puchuncaví", "Casablanca", "La Calera", "La Cruz", "Nogales", "Hijuelas", "Quillota", "San Antonio", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo"],
-    "Metropolitana de Santiago": ["Santiago", "Providencia", "Las Condes", "Ñuñoa", "Maipú", "Puente Alto", "La Florida", "La Cisterna", "San Bernardo", "Pudahuel", "Quilicura", "Estación Central", "Recoleta", "Lo Barnechea", "Peñalolén", "Macul", "Lo Prado"],
-    "O’Higgins": ["Rancagua", "Machalí", "Graneros", "San Fernando", "Rengo", "Santa Cruz", "Pichilemu"],
-    "Maule": ["Talca", "Curicó", "Linares", "Cauquenes", "San Clemente", "San Javier", "Constitución"],
-    "Ñuble": ["Chillán", "San Carlos", "Bulnes", "Quirihue"],
-    "Biobío": ["Concepción", "Talcahuano", "Chiguayante", "San Pedro de la Paz", "Coronel", "Lota", "Los Ángeles", "Cabrero", "Nacimiento"],
-    "La Araucanía": ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol"],
-    "Los Ríos": ["Valdivia", "La Unión", "Río Bueno"],
-    "Los Lagos": ["Puerto Montt", "Puerto Varas", "Osorno", "Castro", "Ancud", "Quellón"],
-    "Aysén": ["Coyhaique", "Puerto Aysén", "Chile Chico", "Cochrane"],
-    "Magallanes y Antártica": ["Punta Arenas", "Puerto Natales", "Porvenir", "Puerto Williams"]
-};
-
-
 // Referencias a los selects
-const regionSelect = document.getElementById("regiones");
-const comunaSelect = document.getElementById("comunas");
+const regionSelect = document.getElementById("region");
+const comunaSelect = document.getElementById("comuna");
 
-// Cargar regiones al iniciar
-window.addEventListener("DOMContentLoaded", () => {
-    regionSelect.innerHTML = `<option value="">Seleccione región</option>`;
-    for (let region in regionesYComunas) {
-        let option = document.createElement("option");
-        option.value = region;
-        option.textContent = region;
-        regionSelect.appendChild(option);
-    }
-});
-
-// Evento para actualizar comunas
-regionSelect.addEventListener("change", (e) => {
-    let regionSeleccionada = e.target.value;
+// Evento para actualizar comunas cuando se selecciona una región
+regionSelect.addEventListener("change", () => {
+    const regionId = regionSelect.value;
 
     // Limpiar comunas
     comunaSelect.innerHTML = `<option value="">Seleccione comuna</option>`;
 
-    if (regionSeleccionada && regionesYComunas[regionSeleccionada]) {
-        regionesYComunas[regionSeleccionada].forEach(comuna => {
-            let option = document.createElement("option");
-            option.value = comuna;
-            option.textContent = comuna;
-            comunaSelect.appendChild(option);
-        });
+    if (regionId) {
+        fetch(`/get_comunas/${regionId}`)
+            .then(res => res.json())
+            .then(comunas => {
+                comunas.forEach(comuna => {
+                    let option = document.createElement("option");
+                    option.value = comuna.id;
+                    option.textContent = comuna.nombre;
+                    comunaSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Error cargando comunas:", err);
+            });
     }
 });
 
@@ -163,7 +138,7 @@ document.getElementById("form-adopcion").addEventListener("submit", (e) => {
 
     // Tipo mascota
     if (![...document.querySelectorAll('input[name="tipo-mascota"]')].some(r => r.checked)) {
-        setError("error-tipo", "Debe seleccionar un tipo de mascota.");
+        setError("error-tipo-mascota", "Debe seleccionar un tipo de mascota.");
         valido = false;
     }
 

@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <title>Tarea 1 - Ariel León Soto</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
+{% extends 'base.html' %}
 
-    <body>
-        <div class="navbar">
-            <a class="navbar-page" href="./index.html">Inicio</a>
-            <a class="navbar-page" href="./agregar-adopcion.html">Agregar aviso de adopción</a>
-			<a class="navbar-page" href="./listado-adopciones.html">Ver listado de adopciones</a>
-			<a class="navbar-page" href="./estadisticas.html">Estadísticas</a>
-        </div>
-        <h1>Bienvenido/as al sitio de adopciones de perros y gatos</h1>
-        <br/>
-	    <h3>Estos son los últimos avisos de adopción agregados:</h3>
+{% block title %} Tarea 2 - Ariel León Soto {% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Bienvenido/as al sitio de adopciones de perros y gatos</h1>
+    <p>
+    Aquí podrás agregar avisos de adopción, revisar el listado de mascotas disponibles y ver estadísticas generales.
+    </p>
+</div>
+<h3>Estos son los últimos avisos de adopción agregados:</h3>
+
         <table>
             <tr>
                 <th>Fecha publicación</th>
@@ -70,7 +65,8 @@
                 </td>
             </tr>
         </table>
+{% endblock %}
 
-        <script src="../js/adopciones.js"></script>
-    </body>
-</html>
+{% block javascript %}
+<!-- <script lang="javascript" src="{{ url_for('static', filename='js/adopciones.js') }}"></script> -->
+{% endblock %}
