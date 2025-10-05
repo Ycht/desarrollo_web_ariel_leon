@@ -31,20 +31,34 @@ def listado_adopciones():
 
 @app.route("/agregar-adopcion", methods=["GET", "POST"])
 def agregar_adopcion():
+    db = SessionLocal()
+
+    # Cargas regiones
+    regiones = get_regiones()
+    comunas = []
+
+    # Si en GET o POST se recibe region_id
+    region_id = (
+        request.args.get("region_id", type=int)
+        or request.form.get("region_id", type=int)
+    )
+    # Cargar comunas
+    if region_id:
+        comunas = get_comunas_por_region(region_id)
+
     if request.method == "POST":
-        db = SessionLocal()  # para guardar los datos
         try:
-            comuna_id = request.form.get("comuna")
+            comuna_id = request.form.get("comuna_id", type=int)
             sector = request.form.get("sector") or None
             nombre = request.form.get("nombre")
             email = request.form.get("email")
             celular = request.form.get("celular") or None
-            tipo = request.form.get("tipo")
-            cantidad = int(request.form.get("cantidad"))
-            edad = int(request.form.get("edad"))
-            unidad_medida = request.form.get("unidad_medida")
-            fecha_entrega = datetime.fromisoformat(request.form.get("fecha_entrega"))
-            descripcion = request.form.get("descripcion") or None
+            tipo = request.form.get("tipo-mascota")
+            cantidad = int(request.form.get("cantidad-mascota"))
+            edad = int(request.form.get("edad-mascota"))
+            unidad_medida = request.form.get("medida-edad")
+            fecha_entrega = datetime.fromisoformat(request.form.get("fecha-entrega"))
+            descripcion = request.form.get("descripcion-mascota") or None
 
             # Crear aviso de adopción
             aviso = AvisoAdopcion(
@@ -100,9 +114,8 @@ def agregar_adopcion():
         finally:
             db.close()
 
-    # Si es GET → mostrar formulario con regiones
-    regiones = get_regiones()  # carga solo regiones
-    return render_template("agregar-adopcion.html", regiones=regiones)
+    # Si es GET → mostrar formulario (con regiones y comunas si corresponde)
+    return render_template("agregar-adopcion.html", regiones=regiones, comunas=comunas, region_id=region_id)
 
 @app.route("/get_comunas/<int:region_id>")
 def get_comunas(region_id):

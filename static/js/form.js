@@ -1,30 +1,30 @@
-// Referencias a los selects
-const regionSelect = document.getElementById("region");
-const comunaSelect = document.getElementById("comuna");
+// // Referencias a los selects
+// const regionSelect = document.getElementById("region");
+// const comunaSelect = document.getElementById("comuna");
 
-// Evento para actualizar comunas cuando se selecciona una región
-regionSelect.addEventListener("change", () => {
-    const regionId = regionSelect.value;
+// // Evento para actualizar comunas cuando se selecciona una región
+// regionSelect.addEventListener("change", () => {
+//     const regionId = regionSelect.value;
 
-    // Limpiar comunas
-    comunaSelect.innerHTML = `<option value="">Seleccione comuna</option>`;
+//     // Limpiar comunas
+//     comunaSelect.innerHTML = `<option value="">Seleccione comuna</option>`;
 
-    if (regionId) {
-        fetch(`/get_comunas/${regionId}`)
-            .then(res => res.json())
-            .then(comunas => {
-                comunas.forEach(comuna => {
-                    let option = document.createElement("option");
-                    option.value = comuna.id;
-                    option.textContent = comuna.nombre;
-                    comunaSelect.appendChild(option);
-                });
-            })
-            .catch(err => {
-                console.error("Error cargando comunas:", err);
-            });
-    }
-});
+//     if (regionId) {
+//         fetch(`/get_comunas/${regionId}`)
+//             .then(res => res.json())
+//             .then(comunas => {
+//                 comunas.forEach(comuna => {
+//                     let option = document.createElement("option");
+//                     option.value = comuna.id;
+//                     option.textContent = comuna.nombre;
+//                     comunaSelect.appendChild(option);
+//                 });
+//             })
+//             .catch(err => {
+//                 console.error("Error cargando comunas:", err);
+//             });
+//     }
+// });
 
 // Contactar por
 const container = document.getElementById("contactosContainer");

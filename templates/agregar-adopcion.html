@@ -12,7 +12,7 @@
     <select class="form-select" id="region" name="region_id" required>
         <option value="">Seleccione región</option>
         {% for region in regiones %}
-        <option value="{{ region.id }}">{{ region.nombre }}</option>
+            <option value="{{ region.id }}">{{ region.nombre }}</option>
         {% endfor %}
     </select>
     <span class="error" id="error-region"></span>
@@ -21,7 +21,11 @@
     <label for="comuna" class="form-label">Comuna<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
     <select class="form-select" id="comuna" name="comuna_id" required>
         <option value="">Seleccione comuna</option>
-        <!-- Las comunas se cargan dinámicamente en el JS según región -->
+        {% if comunas %}
+            {% for comuna in comunas %}
+                <option value="{{ comuna.id }}">{{ comuna.nombre }}</option>
+            {% endfor %}
+        {% endif %}
     </select>
     <span class="error" id="error-comuna"></span>
 </p>
@@ -126,5 +130,5 @@
 {% endblock %}
 
 {% block javascript %}
-<!-- <script lang="javascript" src="{{ url_for('static', filename='js/form.js') }}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/form.js') }}"></script> -->
 {% endblock %}
