@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, BigInteger, String, ForeignKey, Text, Enum, DateTime, VARCHAR
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 import enum
+from datetime import datetime
 
 DB_NAME = "tarea2"
 DB_USERNAME = "cc5002"
@@ -62,7 +63,7 @@ class Foto(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ruta_archivo = Column(String(300), nullable=False)
     nombre_archivo = Column(String(300), nullable=False)
-    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="fotos")
 
@@ -72,7 +73,7 @@ class ContactarPor(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(Enum("whatsapp", "telegram", "X", "instagram", "tiktok", "otra"), nullable=False)
     identificador = Column(String(150), nullable=False)
-    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 
@@ -93,3 +94,32 @@ def get_comunas_por_region(region_id):
     comunas = session.query(Comuna).filter(Comuna.region_id == region_id).order_by(Comuna.nombre).all()
     session.close()
     return comunas
+
+def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, cantidad, edad, unidad_medida, fecha_entrega, descripcion, fotos, contactos):
+    session = SessionLocal()
+    fecha_ingreso = datetime.now()
+    aviso = AvisoAdopcion(
+        fecha_ingreso=fecha_ingreso,
+        comuna_id=comuna_id,
+        sector=sector,
+        nombre=nombre,
+        email=email,
+        celular=celular,
+        tipo=tipo,
+        cantidad=cantidad,
+        edad=edad,
+        unidad_medida=unidad_medida,
+        fecha_entrega=fecha_entrega,
+        descripcion=descripcion
+    )
+    # fotos
+    for f in fotos:
+        aviso.fotos.append(Foto(ruta_archivo=f["ruta_archivo"], nombre_archivo=f["nombre_archivo"]))
+    
+    # contactos
+    for c in contactos:
+        aviso.contactos.append(ContactarPor(nombre=c["nombre"], identificador=c["identificador"]))
+
+    session.add(aviso)
+    session.commit()
+    session.close()

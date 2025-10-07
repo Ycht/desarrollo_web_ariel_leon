@@ -1,78 +1,70 @@
-// // Referencias a los selects
-// const regionSelect = document.getElementById("region");
-// const comunaSelect = document.getElementById("comuna");
-
-// // Evento para actualizar comunas cuando se selecciona una región
-// regionSelect.addEventListener("change", () => {
-//     const regionId = regionSelect.value;
-
-//     // Limpiar comunas
-//     comunaSelect.innerHTML = `<option value="">Seleccione comuna</option>`;
-
-//     if (regionId) {
-//         fetch(`/get_comunas/${regionId}`)
-//             .then(res => res.json())
-//             .then(comunas => {
-//                 comunas.forEach(comuna => {
-//                     let option = document.createElement("option");
-//                     option.value = comuna.id;
-//                     option.textContent = comuna.nombre;
-//                     comunaSelect.appendChild(option);
-//                 });
-//             })
-//             .catch(err => {
-//                 console.error("Error cargando comunas:", err);
-//             });
-//     }
-// });
-
-// Contactar por
-const container = document.getElementById("contactosContainer");
-const agregarBtn = document.getElementById("agregarBtn");
-const MAX = 5;
-
-// Evento para mostrar input al elegir opción
-container.addEventListener("change", e => {
-if (e.target.classList.contains("contacto-select")) {
-    const input = e.target.nextElementSibling;
-    const eliminar = input.nextElementSibling;
-    if (e.target.value) {
-    input.style.display = "inline-block";
-    input.required = true;
-    eliminar.style.display = "inline-block";
-    } else {
-    input.style.display = "none";
-    input.value = "";
-    input.required = false;
-    eliminar.style.display = "none";
-    }
-}
-});
-
-// Evento para eliminar contacto
-container.addEventListener("click", e => {
-if (e.target.classList.contains("eliminar-btn")) {
-    e.target.parentElement.remove();
-}
-});
-
-// Evento para agregar contacto
-agregarBtn.addEventListener("click", () => {
-if (container.querySelectorAll(".contacto").length >= MAX) {
-    alert("Máximo 5 contactos permitidos.");
-    return;
-}
-const nuevo = container.firstElementChild.cloneNode(true);
-nuevo.querySelector(".contacto-select").value = "";
-nuevo.querySelector(".contacto-input").value = "";
-nuevo.querySelector(".contacto-input").style.display = "none";
-nuevo.querySelector(".contacto-input").required = false;
-nuevo.querySelector(".eliminar-btn").style.display = "none";
-container.appendChild(nuevo);
-});
-
-// Prellenar fecha entrega con ahora + 3 horas
 window.addEventListener("DOMContentLoaded", () => {
+    // Región y comuna
+    const regionSelect = document.getElementById("region");
+    const comunaSelect = document.getElementById("comuna");
+
+    regionSelect.addEventListener("change", () => {
+        const regionId = regionSelect.value;
+        comunaSelect.innerHTML = `<option value="">Seleccione comuna</option>`;
+
+        if (regionId && window.comunasPorRegion[regionId]) {
+            const comunas = window.comunasPorRegion[regionId];
+            comunas.forEach(comuna => {
+                let option = document.createElement("option");
+                option.value = comuna.id;
+                option.textContent = comuna.nombre;
+                comunaSelect.appendChild(option);
+            });
+        }
+    });
+
+    // Contactar por
+    const container = document.getElementById("contactosContainer");
+    const agregarBtn = document.getElementById("agregarBtn");
+    const MAX = 5;
+
+    if (container && agregarBtn) {
+        // Evento para mostrar input al elegir opción
+        container.addEventListener("change", e => {
+            if (e.target.classList.contains("contacto-select")) {
+                const input = e.target.nextElementSibling;
+                const eliminar = input.nextElementSibling;
+                if (e.target.value) {
+                    input.style.display = "inline-block";
+                    input.required = true;
+                    eliminar.style.display = "inline-block";
+                } else {
+                    input.style.display = "none";
+                    input.value = "";
+                    input.required = false;
+                    eliminar.style.display = "none";
+                }
+            }
+        });
+
+        // Evento para eliminar contacto
+        container.addEventListener("click", e => {
+            if (e.target.classList.contains("eliminar-btn")) {
+                e.target.parentElement.remove();
+            }
+        });
+
+        agregarBtn.addEventListener("click", () => {
+            if (container.querySelectorAll(".contacto").length >= MAX) {
+                alert("Máximo 5 contactos permitidos.");
+                return;
+            }
+            const nuevo = container.firstElementChild.cloneNode(true);
+            nuevo.querySelector(".contacto-select").value = "";
+            nuevo.querySelector(".contacto-input").value = "";
+            nuevo.querySelector(".contacto-input").style.display = "none";
+            nuevo.querySelector(".contacto-input").required = false;
+            nuevo.querySelector(".eliminar-btn").style.display = "none";
+            container.appendChild(nuevo);
+        });
+    }
+
+    // Prellenar fecha entrega con ahora + 3 horas
     const fechaEntrega = document.getElementById("fecha-entrega");
     let now = new Date();
     now.setHours(now.getHours() + 3);

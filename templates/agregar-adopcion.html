@@ -12,7 +12,7 @@
     <select class="form-select" id="region" name="region_id" required>
         <option value="">Seleccione región</option>
         {% for region in regiones %}
-            <option value="{{ region.id }}">{{ region.nombre }}</option>
+            <option value="{{ region.id }}" {% if region.id == region_seleccionada %}selected{% endif %}>{{ region.nombre }}</option>
         {% endfor %}
     </select>
     <span class="error" id="error-region"></span>
@@ -23,7 +23,7 @@
         <option value="">Seleccione comuna</option>
         {% if comunas %}
             {% for comuna in comunas %}
-                <option value="{{ comuna.id }}">{{ comuna.nombre }}</option>
+                <option value="{{ comuna.id }}" {% if comuna.id == comuna_seleccionada %}selected{% endif %}>{{ comuna.nombre }}</option>
             {% endfor %}
         {% endif %}
     </select>
@@ -103,8 +103,8 @@
     <label for="medida-edad" class="form-label">Unidad medida edad<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
     <select id="medida-edad" name="medida-edad" required>
         <option value="">Seleccione</option>
-        <option value="meses">Meses</option>
-        <option value="años">Años</option>
+        <option value="m">Meses</option>
+        <option value="a">Años</option>
     </select>
     <span class="error" id="error-medida-edad"></span>
 </p>
@@ -130,5 +130,10 @@
 {% endblock %}
 
 {% block javascript %}
-<!-- <script src="{{ url_for('static', filename='js/form.js') }}"></script> -->
+
+<script>
+    window.comunasPorRegion = JSON.parse('{{ comunas_por_region | tojson | safe }}');
+</script>
+
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, flash, jsonify
 from datetime import datetime
-from database.db import SessionLocal, init_db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor, get_regiones, get_comunas_por_region
+from database.db import SessionLocal, init_db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor, get_regiones, get_comunas_por_region, create_aviso_adopcion
 from werkzeug.utils import secure_filename
 import hashlib
 import filetype
@@ -31,21 +31,6 @@ def listado_adopciones():
 
 @app.route("/agregar-adopcion", methods=["GET", "POST"])
 def agregar_adopcion():
-    db = SessionLocal()
-
-    # Cargas regiones
-    regiones = get_regiones()
-    comunas = []
-
-    # Si en GET o POST se recibe region_id
-    region_id = (
-        request.args.get("region_id", type=int)
-        or request.form.get("region_id", type=int)
-    )
-    # Cargar comunas
-    if region_id:
-        comunas = get_comunas_por_region(region_id)
-
     if request.method == "POST":
         try:
             comuna_id = request.form.get("comuna_id", type=int)
@@ -60,62 +45,49 @@ def agregar_adopcion():
             fecha_entrega = datetime.fromisoformat(request.form.get("fecha-entrega"))
             descripcion = request.form.get("descripcion-mascota") or None
 
-            # Crear aviso de adopción
-            aviso = AvisoAdopcion(
-                fecha_ingreso=datetime.now(),
-                comuna_id=comuna_id,
-                sector=sector,
-                nombre=nombre,
-                email=email,
-                celular=celular,
-                tipo=tipo,
-                cantidad=cantidad,
-                edad=edad,
-                unidad_medida=unidad_medida,
-                fecha_entrega=fecha_entrega,
-                descripcion=descripcion,
-            )
-            db.add(aviso)
-            db.commit()
-            db.refresh(aviso)
+            # Fotos
+            fotos = []
+            for f in request.files.getlist("foto-mascota"):
+                if f.filename:
+                    filename = secure_filename(f.filename)
+                    path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                    f.save(path)
+                    fotos.append({"ruta_archivo": path, "nombre_archivo": filename})
 
-            # Procesar contactos opcionales
-            contactos = request.form.getlist("contactos[]")
-            ids = request.form.getlist("contactos_id[]")
-            for nombre_contacto, identificador in zip(contactos, ids):
-                if nombre_contacto and identificador:
-                    c = ContactarPor(
-                        nombre=nombre_contacto,
-                        identificador=identificador,
-                        actividad_id=aviso.id,
-                    )
-                    db.add(c)
+            # Contactos
+            contactos = []
+            container_prefix = "contacto-select-"
+            for i in range(1,6):
+                tipo_contacto = request.form.get(f"{container_prefix}{i}")
+                ident = request.form.get(f"contacto-input-{i}")
+                if tipo_contacto and ident:
+                    contactos.append({"nombre": tipo_contacto, "identificador": ident})
 
-            # Procesar fotos
-            fotos = request.files.getlist("fotos")
-            for foto in fotos:
-                if foto.filename:
-                    filename = secure_filename(foto.filename)
-                    f = Foto(
-                        ruta_archivo=f"uploads/{filename}",
-                        nombre_archivo=filename,
-                        actividad_id=aviso.id,
-                    )
-                    db.add(f)
-                    foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            db.commit()
-            return redirect(url_for("listado_adopciones"))
+            create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, cantidad,
+                              edad, unidad_medida, fecha_entrega, descripcion, fotos, contactos)
+            
+            return redirect(url_for("index"))
 
         except Exception as e:
-            db.rollback()
-            return f"Error al guardar: {e}"
+            return f"Error al guardar aviso de adopción: {e}"
 
-        finally:
-            db.close()
+    # GET: Mostrar formulario
+    try:
+        db = SessionLocal()
+        regiones = db.query(Region).order_by(Region.nombre).all()
 
-    # Si es GET → mostrar formulario (con regiones y comunas si corresponde)
-    return render_template("agregar-adopcion.html", regiones=regiones, comunas=comunas, region_id=region_id)
+        comunas_por_region = {}
+        for region in regiones:
+            comunas = db.query(Comuna).filter(Comuna.region_id == region.id).order_by(Comuna.nombre).all()
+            comunas_por_region[region.id] = [{"id": c.id, "nombre": c.nombre} for c in comunas]
+    finally:
+        db.close()
+
+    return render_template(
+        "agregar-adopcion.html",
+        regiones=regiones,
+        comunas_por_region=comunas_por_region
+    )
 
 @app.route("/get_comunas/<int:region_id>")
 def get_comunas(region_id):
