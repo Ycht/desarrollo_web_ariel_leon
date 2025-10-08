@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from datetime import datetime
-from database.db import SessionLocal, init_db, Region, Comuna, get_comunas_por_region, create_aviso_adopcion, get_avisos
+from database.db import SessionLocal, init_db, Region, Comuna, create_aviso_adopcion, get_avisos, get_aviso_por_id
 from werkzeug.utils import secure_filename
 import os
 
@@ -94,10 +94,30 @@ def agregar_adopcion():
         comunas_por_region=comunas_por_region
     )
 
-@app.route("/get_comunas/<int:region_id>")
-def get_comunas(region_id):
-    comunas = get_comunas_por_region(region_id)
-    return jsonify([{"id": c.id, "nombre": c.nombre} for c in comunas])
+@app.route("/aviso/<int:aviso_id>")
+def detalle_aviso(aviso_id):
+    """
+    Muestra la información detallada de un aviso de adopción específico.
+    """
+    aviso = get_aviso_por_id(aviso_id)
+    if not aviso:
+        return render_template("404.html"), 404 # TODO
+
+    # Formatear contactos en una lista
+    contactos = [
+        {"nombre": c.nombre, "identificador": c.identificador}
+        for c in aviso.contactos
+    ]
+
+    # Formatear fecha
+    fecha_ingreso = aviso.fecha_ingreso.strftime("%d-%m-%Y %H:%M")
+
+    return render_template(
+        "detalle_aviso.html",
+        aviso=aviso,
+        contactos=contactos,
+        fecha_ingreso=fecha_ingreso
+    )
 
 @app.route("/estadisticas")
 def estadisticas():

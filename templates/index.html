@@ -20,11 +20,11 @@
                 <th>Foto/s</th>
             </tr>
             {% for aviso in ultimos_avisos %}
-            <tr>
+            <tr class="fila-aviso" data-id="{{ aviso.id }}" style="cursor:pointer;">
                 <td>{{ aviso.fecha_ingreso }}</td>
-                <td>{{ aviso.comuna }}</td>
-                <td>{{ aviso.sector }}</td>
-                <td>{{ aviso.detalle }}</td>
+                <td>{{ aviso.comuna.nombre }}</td>
+                <td>{{ aviso.sector or '-' }}</td>
+                <td>{{ aviso.cantidad }} - {{ aviso.tipo }} - {{ aviso.edad }} {{ 'meses' if aviso.unidad_medida == 'm' else 'años' }}</td>
                 <td>
                     {% for foto in aviso.fotos %}
                         <img src="{{ foto.ruta_archivo }}" alt="Foto" width="320" height="240">

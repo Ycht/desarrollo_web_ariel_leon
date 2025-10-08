@@ -180,3 +180,25 @@ def get_avisos(limit=None, page=None, page_size=5):
             return query.all()
     finally:
         session.close()
+
+def get_aviso_por_id(aviso_id):
+    """
+    Obtiene un aviso de adopción específico por su ID con su info relacionada.
+    - aviso_id: ID del aviso a consultar
+    - Devuelve un bjeto AvisoAdopcion o None si no existe.
+    """
+    session = SessionLocal()
+    try:
+        aviso = (
+            session.query(AvisoAdopcion)
+            .options(
+                joinedload(AvisoAdopcion.comuna),
+                joinedload(AvisoAdopcion.fotos),
+                joinedload(AvisoAdopcion.contactos)
+            )
+            .filter(AvisoAdopcion.id == aviso_id)
+            .first()
+        )
+        return aviso
+    finally:
+        session.close()

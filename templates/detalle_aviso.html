@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %} Aviso N°{{ aviso.id }} - {{ aviso.tipo|capitalize }} {% endblock %}
+
+{% block content %}
+<h1>Tipo de mascota: {{ aviso.tipo|capitalize }}</h1>
+<h2>Cantidad: {{ aviso.cantidad }}</h2>
+<h2>Edad: {{ aviso.edad }} {{ 'meses' if aviso.unidad_medida == 'm' else 'años' }}</h2>
+
+<br/>
+<h2>Fecha publicación: {{ fecha_ingreso }}</h2>
+<h2>Comuna: {{ aviso.comuna.nombre }}</h2>
+{% if aviso.sector %}
+<h3>Sector: {{ aviso.sector }}</h3>
+{% endif %}
+
+<br/>
+<p>Contacto: {{ aviso.nombre }}</p>
+<ul>
+    {% if aviso.celular %}
+        <li>{{ aviso.celular }}</li>
+    {% endif %}
+    {% for c in contactos %}
+        <li>{{ c.nombre|capitalize }}: {{ c.identificador }}</li>
+    {% endfor %}
+    <li>{{ aviso.email }}</li>
+</ul>
+
+{% if aviso.descripcion %}
+<p><strong>Descripción:</strong> {{ aviso.descripcion }}</p>
+{% endif %}
+
+<br/>
+<h3>Foto/s</h3>
+{% for foto in aviso.fotos %}
+    <img class="foto-aviso" id="myImg" src="{{ url_for('static', filename=foto.ruta_archivo.split('static/')[-1]) }}"
+            alt="Foto aviso {{ aviso.id }}" width="320" height="240">
+{% else %}
+    <p><em>No hay fotos disponibles.</em></p>
+{% endfor %}
+
+<br/><br/>
+<div class="nav-buttons">
+    <a href="{{ url_for('listado_adopciones') }}" class="btn">⬅️ Volver al listado</a>
+    <a href="{{ url_for('index') }}" class="btn">Volver al inicio</a>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/adopciones.js') }}"></script>
+{% endblock %}

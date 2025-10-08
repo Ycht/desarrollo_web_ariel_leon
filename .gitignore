@@ -5,9 +5,14 @@ venv/
 # Archivos temporales
 *.pyc
 __pycache__/
+*.log
+*.bak
+*.tmp
 
 # Archivos de VSCode
 .vscode/
 
 # Subidas o contenido pesado
-uploads/
+static/uploads/*
+!static/uploads/
+!static/uploads/.gitkeep
