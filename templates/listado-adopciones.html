@@ -4,18 +4,42 @@
 
 {% block content %}
 <h1>Listado de adopciones</h1>
-<ul>
-  {% for aviso in avisos %}
-  <li>
-    <strong>{{ aviso.tipo | capitalize }}</strong>
-    ({{ aviso.cantidad }}) - {{ aviso.comuna.nombre }}
-    <br />
-    Contacto: {{ aviso.nombre }} ({{ aviso.email }})
-  </li>
-  {% endfor %}
-</ul>
+
+<table>
+	<tr>
+		<th>Fecha publicación</th>
+		<th>Comuna</th>
+		<th>Sector</th>
+		<th>Cantidad - Tipo - Edad</th>
+		<th>Foto/s</th>
+	</tr>
+
+	{% for aviso in avisos %}
+	<tr>
+		<td>{{ aviso.fecha_ingreso }}</td>
+		<td>{{ aviso.comuna.nombre }}</td>
+		<td>{{ aviso.sector or '-' }}</td>
+		<td>{{ aviso.cantidad }} - {{ aviso.tipo }} - {{ aviso.edad }} {{ aviso.unidad_medida }}</td>
+		<td>
+			{% for foto in aviso.fotos %}
+			<img src="{{ foto.ruta_archivo }}" alt="Foto" width="320" height="240">
+			{% endfor %}
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<div class="pagination">
+	{% if page > 1 %}
+	<a href="{{ url_for('listado_adopciones', page=page-1) }}">« Anterior</a>
+	{% endif %}
+	Página {{ page }} de {{ total_pages }}
+	{% if page < total_pages %} <a href="{{ url_for('listado_adopciones', page=page+1) }}">Siguiente »</a>
+		{% endif %}
+</div>
+
 {% endblock %}
 
 {% block javascript %}
-<!-- <script lang="javascript" src="{{ url_for('static', filename='js/adopciones.js') }}"></script> -->
+	<script src="{{ url_for('static', filename='js/adopciones.js') }}"></script>
 {% endblock %}

@@ -1,9 +1,7 @@
-from flask import Flask, request, render_template, redirect, url_for, session, flash, jsonify
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from datetime import datetime
-from database.db import SessionLocal, init_db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor, get_regiones, get_comunas_por_region, create_aviso_adopcion
+from database.db import SessionLocal, init_db, Region, Comuna, get_comunas_por_region, create_aviso_adopcion, get_avisos
 from werkzeug.utils import secure_filename
-import hashlib
-import filetype
 import os
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -20,14 +18,21 @@ init_db()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    ultimos_avisos = get_avisos(limit=5)
+    return render_template("index.html", ultimos_avisos=ultimos_avisos)
 
 @app.route("/listado-adopciones")
 def listado_adopciones():
-    db = SessionLocal()
-    adopciones = db.query(AvisoAdopcion).all()
-    db.close()
-    return render_template("listado-adopciones.html", adopciones=adopciones)
+    # Obtener el número de página
+    page = request.args.get("page", default=1, type=int)
+    avisos, total_pages = get_avisos(page=page, page_size=5)
+
+    return render_template(
+        "listado-adopciones.html",
+        avisos=avisos,
+        page=page,
+        total_pages=total_pages
+    )
 
 @app.route("/agregar-adopcion", methods=["GET", "POST"])
 def agregar_adopcion():

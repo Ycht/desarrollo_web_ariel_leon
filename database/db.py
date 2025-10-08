@@ -1,7 +1,9 @@
-from sqlalchemy import create_engine, Column, Integer, BigInteger, String, ForeignKey, Text, Enum, DateTime, VARCHAR
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
-import enum
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Enum, DateTime
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship, joinedload
 from datetime import datetime
+from math import ceil
+
+# ---- Database Config ----
 
 DB_NAME = "tarea2"
 DB_USERNAME = "cc5002"
@@ -81,21 +83,46 @@ class ContactarPor(Base):
 # ---- Database Functions ----
 
 def init_db():
+    """
+    Crea todas las tablas en la base de datos según los modelos declarados.
+    """
     Base.metadata.create_all(bind=engine)
 
 def get_regiones():
+    """
+    Obtiene todas las regiones ordenadas por nombre.
+    Devuelve una lista de objetos Region.
+    """
     session = SessionLocal()
     regiones = session.query(Region).order_by(Region.nombre).all()
     session.close()
     return regiones
 
 def get_comunas_por_region(region_id):
+    """
+    Obtiene las comunas pertenecientes a una región específica.
+    - region_id: ID de la región
+    Devuelve una lista de objetos Comuna.
+    """
     session = SessionLocal()
     comunas = session.query(Comuna).filter(Comuna.region_id == region_id).order_by(Comuna.nombre).all()
     session.close()
     return comunas
 
-def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, cantidad, edad, unidad_medida, fecha_entrega, descripcion, fotos, contactos):
+def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, cantidad, edad, unidad_medida,
+                           fecha_entrega, descripcion, fotos, contactos):
+    """
+    Crea un aviso de adopción y lo guarda en la base de datos.
+    - comuna_id: ID de la comuna
+    - sector: Nombre del sector (opcional)
+    - nombre, email, celular: Datos del contacto responsable de la publicación
+    - tipo: 'gato' o 'perro'
+    - cantidad, edad, unidad_medida: Info de la/s mascota/s
+    - fecha_entrega: fecha disponible para entrega
+    - descripcion: descripción del aviso
+    - fotos: lista de diccionarios con keys 'ruta_archivo' y 'nombre_archivo'
+    - contactos: lista de diccionarios con keys 'nombre' e 'identificador'
+    """
     session = SessionLocal()
     fecha_ingreso = datetime.now()
     aviso = AvisoAdopcion(
@@ -114,7 +141,9 @@ def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, canti
     )
     # fotos
     for f in fotos:
-        aviso.fotos.append(Foto(ruta_archivo=f["ruta_archivo"], nombre_archivo=f["nombre_archivo"]))
+        # Normalizar slashes para que no hayan problemas según el sistema
+        ruta_archivo_normalizada = f["ruta_archivo"].replace("\\", "/")
+        aviso.fotos.append(Foto(ruta_archivo=ruta_archivo_normalizada, nombre_archivo=f["nombre_archivo"]))
     
     # contactos
     for c in contactos:
@@ -123,3 +152,31 @@ def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, canti
     session.add(aviso)
     session.commit()
     session.close()
+
+def get_avisos(limit=None, page=None, page_size=5):
+    """
+    Obtiene avisos de adopción con fotos y comuna cargadas.
+    - limit: Si está definido, devuelve los últimos 'limit' avisos.
+    - page: Si está definido, devuelve avisos paginados según 'page_size'.
+    - page_size: cantidad de avisos por página (5 por defecto).
+    Devuelve una lista de objetos AvisoAdopcion si se usa limit o una
+    tupla (lista de objetos AvisoAdopcion, total_pages) si se usa 'page'
+    """
+    session = SessionLocal()
+    try:
+        query = session.query(AvisoAdopcion).options(
+            joinedload(AvisoAdopcion.comuna),
+            joinedload(AvisoAdopcion.fotos)
+        ).order_by(AvisoAdopcion.fecha_ingreso.desc())
+
+        if limit is not None:
+            return query.limit(limit).all()
+        elif page is not None:
+            total = query.count()
+            total_pages = ceil(total / page_size)
+            avisos = query.offset((page - 1) * page_size).limit(page_size).all()
+            return avisos, total_pages
+        else:
+            return query.all()
+    finally:
+        session.close()

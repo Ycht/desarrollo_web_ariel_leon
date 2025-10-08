@@ -11,6 +11,3 @@ __pycache__/
 
 # Subidas o contenido pesado
 uploads/
-
-database/
-*
