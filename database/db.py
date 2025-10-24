@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Enum, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Enum, DateTime, func, extract
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship, joinedload
 from datetime import datetime
 from math import ceil
@@ -109,6 +109,22 @@ def get_comunas_por_region(region_id):
     session.close()
     return comunas
 
+def get_regiones_y_comunas():
+    """
+    Devuelve todas las regiones con sus comunas asociadas,
+    estructuradas como un diccionario {region.id: [comunas]}.
+    """
+    session = SessionLocal()
+    try:
+        regiones = session.query(Region).order_by(Region.nombre).all()
+        comunas_por_region = {}
+        for region in regiones:
+            comunas = session.query(Comuna).filter(Comuna.region_id == region.id).order_by(Comuna.nombre).all()
+            comunas_por_region[region.id] = [{"id": c.id, "nombre": c.nombre} for c in comunas]
+        return regiones, comunas_por_region
+    finally:
+        session.close()
+
 def create_aviso_adopcion(comuna_id, sector, nombre, email, celular, tipo, cantidad, edad, unidad_medida,
                            fecha_entrega, descripcion, fotos, contactos):
     """
@@ -200,5 +216,86 @@ def get_aviso_por_id(aviso_id):
             .first()
         )
         return aviso
+    finally:
+        session.close()
+
+def get_avisos_por_dia():
+    """
+    Retorna una lista de tuplas (fecha, cantidad) con la cantidad de avisos
+    agregados por día.
+    """
+    session = SessionLocal()
+    try:
+        resultados = (
+            session.query(
+                func.date(AvisoAdopcion.fecha_ingreso).label("dia"),
+                func.count(AvisoAdopcion.id).label("cantidad")
+            )
+            .group_by(func.date(AvisoAdopcion.fecha_ingreso))
+            .order_by(func.date(AvisoAdopcion.fecha_ingreso))
+            .all()
+        )
+        # Devuelve listas separadas para fácil graficación
+        fechas = [r.dia.strftime("%Y-%m-%d") for r in resultados]
+        cantidades = [r.cantidad for r in resultados]
+        return fechas, cantidades
+    finally:
+        session.close()
+
+def get_avisos_por_tipo():
+    """
+    Retorna un diccionario con el total de avisos agrupados por tipo de mascota.
+    Ejemplo: {"perro": 12, "gato": 8}
+    """
+    session = SessionLocal()
+    try:
+        resultados = (
+            session.query(
+                AvisoAdopcion.tipo,
+                func.count(AvisoAdopcion.id)
+            )
+            .group_by(AvisoAdopcion.tipo)
+            .all()
+        )
+        return {tipo: cantidad for tipo, cantidad in resultados}
+    finally:
+        session.close()
+
+
+def get_avisos_por_mes_y_tipo():
+    """
+    Retorna la cantidad de avisos por mes y tipo de mascota.
+    Devuelve tres listas paralelas:
+    - meses: ["2025-01", "2025-02", ...]
+    - gatos: [n1, n2, ...]
+    - perros: [m1, m2, ...]
+    """
+    session = SessionLocal()
+    try:
+        resultados = (
+            session.query(
+                extract("year", AvisoAdopcion.fecha_ingreso).label("anio"),
+                extract("month", AvisoAdopcion.fecha_ingreso).label("mes"),
+                AvisoAdopcion.tipo,
+                func.count(AvisoAdopcion.id).label("cantidad")
+            )
+            .group_by("anio", "mes", AvisoAdopcion.tipo)
+            .order_by("anio", "mes")
+            .all()
+        )
+
+        # Reorganizar datos en formato { "YYYY-MM": {"gato": x, "perro": y} }
+        datos = {}
+        for anio, mes, tipo, cantidad in resultados:
+            clave = f"{int(anio):04d}-{int(mes):02d}"
+            if clave not in datos:
+                datos[clave] = {"gato": 0, "perro": 0}
+            datos[clave][tipo] = cantidad
+
+        meses = list(datos.keys())
+        gatos = [datos[m]["gato"] for m in meses]
+        perros = [datos[m]["perro"] for m in meses]
+
+        return meses, gatos, perros
     finally:
         session.close()

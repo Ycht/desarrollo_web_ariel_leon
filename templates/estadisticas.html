@@ -4,17 +4,12 @@
 
 {% block content %}
 <h1>Estadísticas</h1>
-<ul>
-    <li>Total de avisos: {{ total_avisos }}</li>
-    <li>Total de fotos: {{ total_fotos }}</li>
-    <li>Total de contactos: {{ total_contactos }}</li>
-</ul>
-
-<h1>Estadísticas</h1>
 <br/>
-<img id="myImg1" alt="Avisos por día (gráfico de línea)" src="{{ url_for('static', filename='graphs/graf_linea.png') }}">
-<img id="myImg2" alt="Avisos por tipo (gráfico de torta)" src="{{ url_for('static', filename='graphs/graf_torta.png') }}">
-<img id="myImg3" alt="Avisos por mes (gráfico de barras)" src="{{ url_for('static', filename='graphs/graf_barras.png') }}">
+
+<!-- Gráfico 1: Avisos por día -->
+<div id="graficoPorDia" class="my-5"></div>
+<div id="graficoPorTipo" class="my-5"></div>
+<div id="graficoPorMesYTipo" class="my-5"></div>
 
 <div class="nav-buttons">
     <a href="{{ url_for('index') }}" class="btn">Volver al inicio</a>
@@ -22,5 +17,11 @@
 {% endblock %}
 
 {% block javascript %}
-<!-- <script lang="javascript" src="{{ url_for('static', filename='js/adopciones.js') }}"></script> -->
+<script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+
+<!-- Importar Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 {% endblock %}

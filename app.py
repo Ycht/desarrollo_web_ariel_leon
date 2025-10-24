@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from datetime import datetime
-from database.db import SessionLocal, init_db, Region, Comuna, create_aviso_adopcion, get_avisos, get_aviso_por_id
+from database.db import init_db, create_aviso_adopcion, get_avisos, get_aviso_por_id, get_regiones_y_comunas, get_avisos_por_dia, get_avisos_por_tipo, get_avisos_por_mes_y_tipo
 from werkzeug.utils import secure_filename
 import os
 
@@ -77,16 +77,7 @@ def agregar_adopcion():
             return f"Error al guardar aviso de adopción: {e}"
 
     # GET: Mostrar formulario
-    try:
-        db = SessionLocal()
-        regiones = db.query(Region).order_by(Region.nombre).all()
-
-        comunas_por_region = {}
-        for region in regiones:
-            comunas = db.query(Comuna).filter(Comuna.region_id == region.id).order_by(Comuna.nombre).all()
-            comunas_por_region[region.id] = [{"id": c.id, "nombre": c.nombre} for c in comunas]
-    finally:
-        db.close()
+    regiones, comunas_por_region = get_regiones_y_comunas()
 
     return render_template(
         "agregar-adopcion.html",
@@ -122,6 +113,18 @@ def detalle_aviso(aviso_id):
 @app.route("/estadisticas")
 def estadisticas():
     return render_template("estadisticas.html")
+
+@app.route("/api/estadisticas")
+def api_estadisticas():
+    fechas, cantidades = get_avisos_por_dia()
+    tipos = get_avisos_por_tipo()
+    meses, gatos, perros = get_avisos_por_mes_y_tipo()
+
+    return jsonify({
+        "por_dia": {"fechas": fechas, "cantidades": cantidades},
+        "por_tipo": tipos,
+        "por_mes_y_tipo": {"meses": meses, "gatos": gatos, "perros": perros}
+    })
 
 
 # ---- MAIN ----
