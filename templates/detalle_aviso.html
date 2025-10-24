@@ -39,6 +39,24 @@
     <p><em>No hay fotos disponibles.</em></p>
 {% endfor %}
 
+<h3>Comentarios</h3>
+<div id="comentarios"><p>Cargando comentarios...</p></div>
+
+<hr>
+
+<h4>Agregar comentario</h4>
+<form id="formComentario">
+    <label for="nombre">Nombre:</label><br>
+    <input type="text" id="nombre" name="nombre" minlength="3" maxlength="80" required><br><br>
+
+    <label for="texto">Comentario:</label><br>
+    <textarea id="texto" name="texto" rows="4" cols="50" minlength="5" required></textarea><br><br>
+
+    <button type="submit">Agregar comentario</button>
+</form>
+
+<p id="mensaje"></p>
+
 <br/><br/>
 <div class="nav-buttons">
     <a href="{{ url_for('listado_adopciones') }}" class="btn">⬅️ Volver al listado</a>
@@ -48,4 +66,8 @@
 
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/adopciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/comentarios.js') }}"></script>
+<script>
+    const avisoId = {{ aviso.id | tojson }};
+</script>
 {% endblock %}

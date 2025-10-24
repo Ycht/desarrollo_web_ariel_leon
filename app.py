@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask_cors import cross_origin
 from datetime import datetime
-from database.db import init_db, create_aviso_adopcion, get_avisos, get_aviso_por_id, get_regiones_y_comunas, get_avisos_por_dia, get_avisos_por_tipo, get_avisos_por_mes_y_tipo
+from database.db import init_db, create_aviso_adopcion, get_avisos, get_aviso_por_id, get_regiones_y_comunas, get_avisos_por_dia, get_avisos_por_tipo, get_avisos_por_mes_y_tipo, get_comentarios_por_aviso, add_comentario
 from werkzeug.utils import secure_filename
 import os
 
@@ -126,6 +127,44 @@ def api_estadisticas():
         "por_mes_y_tipo": {"meses": meses, "gatos": gatos, "perros": perros}
     })
 
+@app.route("/comentarios/<int:aviso_id>", methods=["GET"])
+@cross_origin(origin="127.0.0.1", supports_credentials=True)
+def mostrar_comentarios(aviso_id):
+    """
+    Devuelve los comentarios de un aviso de adopción en formato JSON.
+    """
+    comentarios = get_comentarios_por_aviso(aviso_id)
+    comentarios_data = [
+        {
+            "nombre": c.nombre,
+            "texto": c.texto,
+            "fecha": c.fecha.strftime("%d-%m-%Y %H:%M")
+        }
+        for c in comentarios
+    ]
+    return jsonify(comentarios_data)
+
+@app.route("/comentarios/<int:aviso_id>", methods=["POST"])
+@cross_origin(origin="127.0.0.1", supports_credentials=True)
+def agregar_comentario(aviso_id):
+    """
+    Recibe un nuevo comentario mediante JSON y lo guarda en la base de datos.
+    """
+    data = request.get_json()
+    nombre = data.get("nombre", "").strip()
+    texto = data.get("texto", "").strip()
+
+    # Validaciones
+    if not (3 <= len(nombre) <= 80):
+        return jsonify({"success": False, "error": "El nombre debe ser de largo mínimo 3 y máximo 80."}), 400
+    if len(texto) < 5:
+        return jsonify({"success": False, "error": "El comentario debe tener al menos 5 caracteres."}), 400
+
+    ok = add_comentario(aviso_id, nombre, texto)
+    if ok:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Error al guardar el comentario."}), 500
 
 # ---- MAIN ----
 

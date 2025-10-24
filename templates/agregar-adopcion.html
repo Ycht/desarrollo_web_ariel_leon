@@ -119,8 +119,14 @@
 </p>
 <p>
     <label for="foto-mascota" class="form-label">Foto/s<abbr title="Este campo es obligatorio" aria-label="required">*</abbr></label>
-    <input type="file" id="foto-mascota" name="foto-mascota" multiple accept="image/*" required>
-    <span class="error" id="error-foto"></span>
+    <div id="fotosContainer">
+    <div class="foto">
+        <input type="file" name="foto-mascota" accept="image/*" required>
+        <button type="button" class="eliminar-foto-btn" style="display:none;">Eliminar</button>
+    </div>
+</div>
+<button type="button" id="agregarFotoBtn">Agregar foto</button>
+<span class="error" id="error-foto"></span>
 </p>
 
 <p>

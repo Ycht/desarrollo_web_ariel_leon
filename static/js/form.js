@@ -69,6 +69,41 @@ window.addEventListener("DOMContentLoaded", () => {
     let now = new Date();
     now.setHours(now.getHours() + 3);
     fechaEntrega.value = now.toISOString().slice(0,16);
+
+    // Fotos
+    const fotosContainer = document.getElementById("fotosContainer");
+    const agregarFotoBtn = document.getElementById("agregarFotoBtn");
+    const MAX_FOTOS = 5;
+
+    if (fotosContainer && agregarFotoBtn) {
+        // Agregar nueva foto
+        agregarFotoBtn.addEventListener("click", () => {
+            const total = fotosContainer.querySelectorAll(".foto").length;
+            if (total >= MAX_FOTOS) {
+                alert("Máximo 5 fotos permitidas.");
+                return;
+            }
+            const nuevo = fotosContainer.firstElementChild.cloneNode(true);
+            const input = nuevo.querySelector("input");
+            input.value = "";
+            input.required = true;
+            const eliminarBtn = nuevo.querySelector(".eliminar-foto-btn");
+            eliminarBtn.style.display = "inline-block";
+            fotosContainer.appendChild(nuevo);
+        });
+
+        // Evento para eliminar foto
+        fotosContainer.addEventListener("click", e => {
+            if (e.target.classList.contains("eliminar-foto-btn")) {
+                const total = fotosContainer.querySelectorAll(".foto").length;
+                if (total <= 1) {
+                    alert("Debe haber al menos una foto.");
+                    return;
+                }
+                e.target.parentElement.remove();
+            }
+        });
+    }
 });
 
 function setError(id, mensaje) {
@@ -164,11 +199,17 @@ document.getElementById("form-adopcion").addEventListener("submit", (e) => {
     }
 
     // Foto (1 a 5)
-    const fotos = document.getElementById("foto-mascota").files;
-    if (fotos.length < 1 || fotos.length > 5) {
-        setError("error-foto", "Debe subir entre 1 y 5 fotos.");
+    const fotosInputs = fotosContainer.querySelectorAll("input[type='file']");
+    if (fotosInputs.length < 1 || fotosInputs.length > MAX_FOTOS) {
+        setError("error-foto", `Debe subir entre 1 y ${MAX_FOTOS} fotos.`);
         valido = false;
+    } else {
+        // Validar que cada input tenga archivo seleccionado
+        fotosInputs.forEach((input, idx) => {
+            if (!input.files || input.files.length === 0) {
+                setError("error-foto", `Debe subir al menos 1 foto.`);
+                valido = false;
+            }
+        });
     }
-
-    if (!valido) e.preventDefault();
 });

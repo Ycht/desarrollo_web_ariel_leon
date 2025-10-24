@@ -58,6 +58,7 @@ class AvisoAdopcion(Base):
     comuna = relationship("Comuna", back_populates="avisos")
     fotos = relationship("Foto", back_populates="aviso")
     contactos = relationship("ContactarPor", back_populates="aviso")
+    comentarios = relationship("Comentario", back_populates="aviso", cascade="all, delete-orphan")
 
 class Foto(Base):
     __tablename__ = "foto"
@@ -79,6 +80,16 @@ class ContactarPor(Base):
 
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 
+class Comentario(Base):
+    __tablename__ = "comentario"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(80), nullable=False)
+    texto = Column(String(300), nullable=False)
+    fecha = Column(DateTime, nullable=False, default=datetime.now)
+    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+
+    aviso = relationship("AvisoAdopcion", back_populates="comentarios")
 
 # ---- Database Functions ----
 
@@ -297,5 +308,38 @@ def get_avisos_por_mes_y_tipo():
         perros = [datos[m]["perro"] for m in meses]
 
         return meses, gatos, perros
+    finally:
+        session.close()
+
+def get_comentarios_por_aviso(aviso_id):
+    """
+    Obtiene los comentarios asociados a un aviso de adopción, ordenados por fecha desde el más reciente.
+    """
+    session = SessionLocal()
+    try:
+        comentarios = (
+            session.query(Comentario)
+            .filter(Comentario.aviso_id == aviso_id)
+            .order_by(Comentario.fecha.desc())
+            .all()
+        )
+        return comentarios
+    finally:
+        session.close()
+
+def add_comentario(aviso_id, nombre, texto):
+    """
+    Crea un nuevo comentario asociado a un aviso de adopción.
+    """
+    session = SessionLocal()
+    try:
+        nuevo = Comentario(aviso_id=aviso_id, nombre=nombre, texto=texto, fecha=datetime.now())
+        session.add(nuevo)
+        session.commit()
+        return True
+    except Exception as e:
+        session.rollback()
+        print(f"Error al agregar comentario: {e}")
+        return False
     finally:
         session.close()
