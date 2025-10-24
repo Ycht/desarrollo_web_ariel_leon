@@ -65,7 +65,7 @@ class Foto(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ruta_archivo = Column(String(300), nullable=False)
     nombre_archivo = Column(String(300), nullable=False)
-    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="fotos")
 
@@ -75,7 +75,7 @@ class ContactarPor(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(Enum("whatsapp", "telegram", "X", "instagram", "tiktok", "otra"), nullable=False)
     identificador = Column(String(150), nullable=False)
-    actividad_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
+    aviso_id = Column(Integer, ForeignKey("aviso_adopcion.id"), nullable=False)
 
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 

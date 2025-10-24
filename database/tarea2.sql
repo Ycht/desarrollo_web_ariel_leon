@@ -75,11 +75,11 @@ CREATE TABLE IF NOT EXISTS `tarea2`.`foto` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ruta_archivo` VARCHAR(300) NOT NULL,
   `nombre_archivo` VARCHAR(300) NOT NULL,
-  `actividad_id` INT NOT NULL,
-  PRIMARY KEY (`id`, `actividad_id`),
-  INDEX `fk_foto_aviso1_idx` (`actividad_id` ASC),
+  `aviso_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `aviso_id`),
+  INDEX `fk_foto_aviso1_idx` (`aviso_id` ASC),
   CONSTRAINT `fk_foto_aviso1`
-    FOREIGN KEY (`actividad_id`)
+    FOREIGN KEY (`aviso_id`)
     REFERENCES `tarea2`.`aviso_adopcion` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -93,11 +93,11 @@ CREATE TABLE IF NOT EXISTS `tarea2`.`contactar_por` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` ENUM('whatsapp', 'telegram', 'X', 'instagram', 'tiktok', 'otra') NOT NULL,
   `identificador` VARCHAR(150) NOT NULL,
-  `actividad_id` INT NOT NULL,
-  PRIMARY KEY (`id`, `actividad_id`),
-  INDEX `fk_contactar_por_aviso1_idx` (`actividad_id` ASC),
+  `aviso_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `aviso_id`),
+  INDEX `fk_contactar_por_aviso1_idx` (`aviso_id` ASC),
   CONSTRAINT `fk_contactar_por_aviso1`
-    FOREIGN KEY (`actividad_id`)
+    FOREIGN KEY (`aviso_id`)
     REFERENCES `tarea2`.`aviso_adopcion` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -113,4 +113,3 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 CREATE USER 'cc5002'@'localhost' IDENTIFIED BY 'programacionweb';
 GRANT ALL PRIVILEGES ON tarea2.* TO 'cc5002'@'localhost';
 FLUSH PRIVILEGES;
-
