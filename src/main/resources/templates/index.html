@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>Avisos</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <h1>Bienvenido/as al sitio de adopciones de perros y gatos</h1>
+
+    <h2>Listado de Avisos de Adopción</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Fecha publicación</th>
+            <th>Sector</th>
+            <th>Cantidad Tipo Edad</th>
+            <th>Comuna</th>
+            <th>Nota</th>
+            <th></th>
+        </tr>
+
+        <tr th:each="row : ${data}" th:attr="data-aviso-id=${row.aviso.id}">
+            <td th:text="${row.aviso.id}"></td>
+            <td th:text="${row.aviso.fechaPublicacion}"></td>
+            <td th:text="${row.aviso.sector}"></td>
+
+            <td>
+                <span th:text="${row.aviso.cantidad}"></span>
+                <span th:text="${row.aviso.tipo}"></span>
+                <span th:text="${row.aviso.edad}"></span>
+                <span th:text="${row.aviso.unidadMedida == 'a' ? 'años' : 'meses'}"></span>
+            </td>
+
+            <td th:text="${row.aviso.comuna}"></td>
+            <td class="promedio" th:text="${row.promedio}"></td>
+
+            <td>
+                <button th:onclick="|evaluar(${row.aviso.id})|">Evaluar</button>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/avisos.js}"></script>
+
+</body>
+</html>
